@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+
+    <title>INVENTORY</title>
+    <style>label{display: inline-block; width: 80px}
+        input,select{width:120px}
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+       
+        <a class="navbar" style="padding: 20px;" href="index.html">
+          <img src="logo.png" alt="Mangan da Kita" width="80" height="80">
+        </a>
+      
+
+    <div class="container-fluid">
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+            <li class="nav-item">
+              <a class="nav-link " aria-current="page" href="home.html">Home</a>
+            </li>
+
+
+            <li class="nav-item">
+              <a class="nav-link" href="contact.html">Contact Information</a>
+            </li>
+            
+            <li class="nav-item">
+              <a class="nav-link" href="sale.html">Items for Sale</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link active" href="menu.html">Items</a>
+            </li>
+
+            <li class="nav-item">
+              <a class="nav-link" href="inventory.html">Inventory</a>
+            </li>
+
+            
+
+            <li class="nav-item">
+              <a class="nav-link" href="techstack.html">Technology Stack</a>
+            </li>
+
+            
+          </ul>
+        <form class="from-inline my-2 my-lg-0">
+
+            <ul class="navbar-nav mr-auto">
+              <li class="nav-item mx-1">
+                <a id="userlink" class="nav-link" href="">Username</a>
+              </li>
+
+              <li class="nav-item mx-1">
+                <a id="signoutlink" class="nav-link" href="">Sign out</a>
+              </li>
+            </ul>
+            
+          </form>
+      </div>
+    </div>
+  </nav>
+
+  <div class="d-flex justify-content-center">
+
+    <img src="banner.jpg" class="img-fluid" alt="Banner">
+
+  </div>
+    <div class="container mt-3">
+        
+        <table class="table table-striped" id="myTable">
+            <thead>
+                <th>#</th>
+                <th>Item Code</th>
+                <th>Item</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Category</th>
+            </thead>
+            <input class="form-control" id="myInput" type="text" placeholder="Search..">
+            <tbody id="tbody1"></tbody>
+        </table>
+    </div>
+
+    <!----------------firebase----------------------->
+
+    <script type="module">
+        // Import the functions you need from the SDKs you need
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.4/firebase-app.js";
+        // TODO: Add SDKs for Firebase products that you want to use
+        // https://firebase.google.com/docs/web/setup#available-libraries
+      
+        // Your web app's Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyCYN5_Cdw6IaqPPL0xhJZ5EmBgx1zcWwzM",
+            authDomain: "assessment-ea79b.firebaseapp.com",
+            databaseURL: "https://assessment-ea79b-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "assessment-ea79b",
+            storageBucket: "assessment-ea79b.appspot.com",
+            messagingSenderId: "486188571893",
+            appId: "1:486188571893:web:e84688b5bd14f69a7279bc"
+        };
+      
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+
+        import { getDatabase, ref, set, child, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/9.6.4/firebase-database.js";
+
+        const db = getDatabase();
+
+
+        //=============================REFERENCES
+
+            var code = document.getElementById("itemcode");
+            var item = document.getElementById("itemname");
+            var price = document.getElementById("itemprice");
+            var quantity = document.getElementById("itemquantity");
+            var category = document.getElementById("itemcateg");
+
+
+            var insBtn = document.getElementById("Insbtn");
+            var selBtn = document.getElementById("Selbtn");
+            var updBtn = document.getElementById("Updbtn");
+            var delBtn = document.getElementById("Delbtn");
+
+
+        //=================== INSERT data function
+
+            function InsertData(){
+                set(ref(db, "Inventory/"+code.value),{
+                    ItemCode: code.value,
+                    Name: item.value,
+                    Price: price.value,
+                    Quantity: quantity.value,
+                    Category: category.value
+
+                })
+
+                .then(()=>{
+                    alert("data stored successfully");
+                })
+                .catch((error)=>{
+                    alert("error"+ error);
+                })
+            }
+
+        //=============== SELECTION ============
+
+            function SelectData(){
+                const dbref = ref(db);
+
+                get(child(dbref,"Inventory/" + code.value)).then((snapshot)=>{
+                    if(snapshot.exists()){
+                        item.value = snapshot.val().Name;
+                        price.value = snapshot.val().Price;
+                        quantity.value = snapshot.val().Quantity;
+                        category.value = snapshot.val().Category;
+
+
+                    }
+                    else{
+                        alert("No data found");
+                    }
+                })
+                .catch((error)=>{
+                    alert("error"+ error);
+                });
+            }
+
+
+        //===============UPDATE======================
+
+            function UpdateData(){
+                update(ref(db, "Inventory/"+code.value),{
+                    Name: item.value,
+                    Section: price.value,
+                    Quantity: quantity.value,
+                    Category: category.value,
+                })
+
+                .then(()=>{
+                    alert("data updated successfully");
+                })
+                .catch((error)=>{
+                    alert("error"+ error);
+                })
+            }
+        
+
+        //============DELETE==========
+
+            function DeleteData(){
+                remove(ref(db, "Inventory/"+code.value),{
+                    
+                })
+
+                .then(()=>{
+                    alert("data removed successfully");
+                })
+                .catch((error)=>{
+                    alert("error"+ error);
+                })
+            }
+            
+        // =================
+
+           
+
+        //==================TABLE
+
+            var ItemNo = 0;
+            var tbody = document.getElementById('tbody1')
+
+            function AddItemToTable(code,name,price,quan,cat){
+                let trow = document.createElement("tr");
+                let td1 = document.createElement('td');
+                let td2 = document.createElement('td');
+                let td3 = document.createElement('td');
+                let td4 = document.createElement('td');
+                let td5 = document.createElement('td');
+                let td6 = document.createElement('td');
+
+                td1.innerHTML = ++ItemNo;
+                td2.innerHTML = code;
+                td3.innerHTML = name;
+                td4.innerHTML = price;
+                td5.innerHTML = quan;
+                td6.innerHTML = cat;
+
+                trow.appendChild(td1);
+                trow.appendChild(td2);
+                trow.appendChild(td3);
+                trow.appendChild(td4);
+                trow.appendChild(td5);
+                trow.appendChild(td6);
+
+                tbody.appendChild(trow);
+            }
+
+            function AddAllItemsToTable(Inventory){
+                ItemNo=0;
+                tbody.innerHTML=" ";
+                Inventory.forEach(element => {
+                    AddItemToTable(element.ItemCode, element.Name, element.Price, element.Quantity, element.Category)
+                });
+            }
+
+
+            //==========FILTERING=================
+
+            $(document).ready(function(){
+                $("#myInput").on("keyup", function() {
+                    var value = $(this).val().toLowerCase();
+                    $("#myTable tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                    });
+                });
+                });
+
+            //===========getData from Firebase ===========================
+
+             function GetAllDataOnce(){
+
+                const dbref = ref(db);
+
+                get(child(dbref,"Inventory/"))
+                .then((snapshot)=>{
+                    var students = [];
+
+                        snapshot.forEach(childSnapshot => {
+                            students.push(childSnapshot.val());
+                        });
+
+                    AddAllItemsToTable(students);
+                   
+                })
+            }
+
+            //============REALTIME GET DATA=============
+
+            function GetAllDataRealttime(){
+
+                const dbref = ref(db,"Inventory/");
+
+                onValue(dbref,(snapshot)=>{
+                    var items = [];
+
+                        snapshot.forEach(childSnapshot => {
+                            items.push(childSnapshot.val());
+                        });
+
+                    AddAllItemsToTable(items);
+                })
+                }
+
+            window.onload = GetAllDataRealttime;
+
+               
+
+      </script>
+
+
+
+
+
+
+
+
+</body>
+</html>
